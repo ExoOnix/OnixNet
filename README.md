@@ -9,7 +9,7 @@
   <a href="https://github.com/ExoOnix/OnixNet/issues">
     <img src="https://img.shields.io/github/issues/ExoOnix/OnixNet?style=for-the-badge" alt="GitHub issues" />
   </a>
-<a href="https://creativecommons.org/licenses/by-nc/4.0/">
+<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
   <img src="https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg?style=for-the-badge" alt="Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License" />
 </a>
 </div>
