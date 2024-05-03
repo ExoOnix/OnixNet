@@ -27,4 +27,4 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        python OnixNet/manage.py test
+        python OnixNet/manage.py test OnixNet
