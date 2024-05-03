@@ -21,6 +21,9 @@ class UserRegisterForm(UserCreationForm):
         user = super().save(commit=False)
         if commit:
             user.save()
-            group = Group.objects.get(name="Users")
+            if not Group.objects.filter(name="Users").exists():
+                group = Group.objects.create(name="Users")
+            else:
+                group = Group.objects.get(name="Users")
             user.groups.add(group)
         return user
