@@ -125,7 +125,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = "website.User"
+AUTH_USER_MODEL = "accounts.User"
 
 # Redirect to home URL after login
 LOGIN_REDIRECT_URL = "/"
