@@ -1,4 +1,4 @@
-
+{% extends "base.html" %}
 {% block content %}
 
 {% if form.errors %}
@@ -14,7 +14,7 @@
 {% endif %}
 {% endif %}
 
-<form method="post" action="{% url 'login' %}">
+<form method="post" action="{% url 'login' %}" class="ms-2">
     {% csrf_token %}
     <table>
         <tr>
@@ -26,11 +26,13 @@
             <td>{{ form.password }}</td>
         </tr>
     </table>
-    <input type="submit" value="login">
+    <input type="submit" value="login" class="btn btn-outline-success">
     <input type="hidden" name="next" value="{{ next }}">
 </form>
 
 {# Assumes you set up the password_reset view in your URLconf #}
-<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+<p><a href="{% url 'password_reset' %}" class="ms-2 button-link">Lost password?</a></p>
+<p><a href="{% url 'signup' %}" class="ms-2 button-link">Sign up instead</a></p>
+
 
 {% endblock %}
