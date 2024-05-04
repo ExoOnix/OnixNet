@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -33,17 +34,22 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            Theme
+                            <img src="{% static 'icons/gray/filled/bulb-both.svg' %}" alt="Color mode">
                         </a>
                         <ul class="dropdown-menu">
                             <li>
                                 <button class="dropdown-item" data-bs-theme-value="light">
-                                    Light Mode
+                                    <img src="{% static 'icons/gray/filled/bulb.svg' %}" alt="Light mode"> Light
                                 </button>
                             </li>
                             <li>
                                 <button class="dropdown-item" data-bs-theme-value="dark">
-                                    Dark Mode
+                                    <img src="{% static 'icons/gray/outline/bulb-off.svg' %}" alt="Dark mode"> Dark
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item" data-bs-theme-value="auto">
+                                    <img src="{%static 'icons/gray/outline/settings-automation.svg' %}"> Auto
                                 </button>
                             </li>
                         </ul>
