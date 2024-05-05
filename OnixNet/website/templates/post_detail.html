@@ -1,9 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
+{% load static %}
+<div class="card center w-75 h-75" style="width: 18rem;">
+    <div class="card-body">
+        <a href="{% url 'index' %}"><img src="{% static 'icons/gray/outline/arrow-left.svg' %}" alt="Back"></a>
+        <small class="mb-0"><strong>{{object.community}}</strong> - {{ object.created_at|timesince }} ago</small>
+        <br>
+        <small>{{ object.author }}</small>
+        <h1>{{ object.title }}</h1>
+        <p>{{ object.content }}</p>
+    </div>
+</div>
 
-<h1>{{ object.title }}</h1>
-<p>{{ object.content }}</p>
-<p>Author: {{ object.author }}</p>
-<p>Published: {{ object.created_at|date }}</p>
-<p>Date: {{ now|date }}</p>
 {% endblock %}
