@@ -15,3 +15,10 @@
     text-decoration: none;
     color: #0047ba;
 }
+
+.post {
+    width: 80%;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
