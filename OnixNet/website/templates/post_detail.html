@@ -4,7 +4,7 @@
 <div class="card center w-75 h-75" style="width: 18rem;">
     <div class="card-body">
         <a href="{% url 'index' %}"><img src="{% static 'icons/gray/outline/arrow-left.svg' %}" alt="Back"></a>
-        <small class="mb-0"><strong>{{object.community}}</strong> - {{ object.created_at|timesince }} ago</small>
+        <small class="mb-0"><strong><a href="/{{object.community}}" class="button-link">{{object.community}}</a></strong> - {{ object.created_at|timesince }} ago</small>
         <br>
         <small>{{ object.author }}</small>
         <h1>{{ object.title }}</h1>
