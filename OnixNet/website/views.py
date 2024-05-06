@@ -58,7 +58,7 @@ def Upload(request):
                 community=Community.objects.get(id=form.cleaned_data["community"].id),
             )
             post_instance.save()
-            return HttpResponseRedirect(f"/c/{Community.objects.get(id=form.cleaned_data["community"].id).name}/{post_instance.pk}")
+            return HttpResponseRedirect(f"/c/{Community.objects.get(id=form.cleaned_data['community'].id).name}/{post_instance.pk}")
 
     # if a GET (or any other method) we'll create a blank form
     else:
