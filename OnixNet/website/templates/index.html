@@ -5,9 +5,9 @@
     <div class="card post mt-3">
         <div class="card-body">
             <h5 class="card-title">{{ post }}</h5>
-            <h6 class="card-subtitle mb-2 text-body-secondary">{{ post.community }} - {{ post.author }}</h6>
+            <h6 class="card-subtitle mb-2 text-body-secondary"><a class="button-link" href="/c/{{ post.community }}">{{ post.community }}</a> - {{ post.author }}</h6>
             <p class="card-text">{{ post.content|slice:":600" }}</p>
-            <a href="{{post.community}}/{{post.pk}}" class="card-link button-link">Open</a>
+            <a href="/c/{{post.community}}/{{post.pk}}" class="card-link button-link">Open</a>
         </div>
     </div>
 

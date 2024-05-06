@@ -1,14 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
 {% load static %}
-<div class="card center w-75 h-75" style="width: 18rem;">
+
+
+
+<div class="card w-75 center-x mt-4" style="width: 18rem; height: 75vh">
     <div class="card-body">
         <a href="{% url 'index' %}"><img src="{% static 'icons/gray/outline/arrow-left.svg' %}" alt="Back"></a>
-        <small class="mb-0"><strong><a href="/{{object.community}}" class="button-link">{{object.community}}</a></strong> - {{ object.created_at|timesince }} ago</small>
+        <small class="mb-0"><strong><a href="/c/{{object.community}}" class="button-link">{{object.community}}</a></strong> - {{ object.created_at|timesince }} ago</small>
         <br>
         <small>{{ object.author }}</small>
         <h1>{{ object.title }}</h1>
         <p>{{ object.content }}</p>
+    </div>
+</div>
+
+
+<div class="card w-75 h-75 center-x mt-3 mb-4" style="width: 18rem;">
+    <h2 class="ms-3 mb-0 mt-1">Comments</h2>
+    <div class="card-body">
+        {% for i in comments %}
+        <div class="card mt-1">
+            <div class="card-body">
+                {{ i.author }} - {{ i.created_at|timesince }} ago<br>
+                {{ i.content }}
+                <br>
+                {% for j in replys %}
+                {% if i.pk == j.pk %}
+                <div class="card mt-1">
+                <div class="card-body">
+                {{ j.author }} - {{ j.created_at|timesince }} ago<br>
+                {{ j.content }}
+                </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
     </div>
 </div>
 
