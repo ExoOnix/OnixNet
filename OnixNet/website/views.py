@@ -6,7 +6,7 @@ from django.views.generic.edit import FormMixin
 from .models import Post, Community, Comment, Reply
 
 
-from .forms import UploadForm, CommentForm
+from .forms import UploadForm, CommentForm, CommunityCreateForm
 
 class index(ListView):
     model = Post
@@ -90,3 +90,23 @@ def Upload(request):
     else:
         form = UploadForm()
     return render(request, "upload.html", {"form": UploadForm})
+
+def CreateCommunity(request):
+    if request.method == "POST":
+        form = CommunityCreateForm(request.POST)
+
+        if form.is_valid():
+            if not Community.objects.filter(name=form.cleaned_data["name"]).exists():
+                community_instance = Community(
+                    name=form.cleaned_data["name"],
+                    description=form.cleaned_data["description"],
+                    admin=request.user,
+                )
+                community_instance.save()
+                return HttpResponseRedirect(
+                    f"/c/{form.cleaned_data['name']}"
+                )
+
+    else:
+        form = CommunityCreateForm()
+    return render(request, "create-community.html", {"form": CommunityCreateForm})

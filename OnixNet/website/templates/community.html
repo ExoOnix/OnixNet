@@ -5,6 +5,7 @@
 <a href="{% url 'index' %}" class="button-link">Go home</a>
 {% else %}
 <center><h1>{{ community.name }}</h1></center>
+<center><p>{{ community.description }}</p></center>
 {% endif %}
 
 {% for post in page_obj %}

@@ -11,4 +11,8 @@ class UploadForm(forms.Form):
     content = forms.CharField(widget=forms.Textarea(), required=True)
 
 class CommentForm(forms.Form):
-    content = forms.CharField(required=True)
+    content = forms.CharField(label="", required=True)
+
+class CommunityCreateForm(forms.Form):
+    name = forms.CharField(label="Name", max_length=50, min_length=2, required=True)
+    description = forms.CharField(label="Description", max_length=600, required=True)
