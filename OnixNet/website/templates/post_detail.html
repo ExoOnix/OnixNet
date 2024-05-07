@@ -4,7 +4,7 @@
 
 
 
-<div class="card w-75 center-x mt-4" style="width: 18rem; height: 75vh">
+<div class="card w-75 center-x mt-4 overflow-auto" style="width: 18rem; height: 75vh">
     <div class="card-body">
         <a href="{% url 'index' %}"><img src="{% static 'icons/gray/outline/arrow-left.svg' %}" alt="Back"></a>
         <small class="mb-0"><strong><a href="/c/{{object.community}}" class="button-link">{{object.community}}</a></strong> - {{ object.created_at|timesince }} ago</small>
@@ -27,13 +27,9 @@
         </form>
         {% endif %}
         {% for i in comments %}
-        <div class="card mt-1">
-            <div class="card-body">
-
-                {{ i.author }} - {{ i.created_at|timesince }} ago<br>
-                {{ i.content }}
-            </div>
-        </div>
+            {% if i.parent_comment == None %}
+            {% include 'components/comment.html' %}
+            {% endif %}
         {% endfor %}
     </div>
 </div>

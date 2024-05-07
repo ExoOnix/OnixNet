@@ -1,0 +1,30 @@
+{% load static %}
+<div class="card mt-1">
+    <div class="card-body">
+
+    {{ i.author }} - {{ i.created_at|timesince }} ago<br>
+    {{ i.content }}
+    
+        {% if user.is_authenticated %}
+        <br>
+  <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#commentform{{ i.pk }}" aria-expanded="false" aria-controls="commentform{{ i.pk }}">
+    <img src="{% static 'icons/gray/outline/messages.svg' %}">
+  </button>
+
+        <div class="collapse" id="commentform{{ i.pk }}">
+        <form action="/c/{{ object.community }}/{{ object.pk }}/reply/{{ i.pk }}" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="Submit" class="btn btn-success">
+        </form>
+        </div>
+        {% endif %}
+
+    {% if i.children %}
+        {% for i in i.children.all %}
+            {% include 'components/comment.html' %}
+        {% endfor %}
+    {% endif %}
+    </div>
+</div>
+

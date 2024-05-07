@@ -49,7 +49,7 @@ class PostDetailView(DetailView, FormMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm(initial={'post': self.object})
-        context["comments"] = Comment.objects.filter(parent_post__pk=self.kwargs["pk"], parent_comment=None).order_by('-created_at')
+        context["comments"] = Comment.objects.filter(parent_post__pk=self.kwargs["pk"]).order_by('-created_at')
         return context
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -109,3 +109,26 @@ def CreateCommunity(request):
     else:
         form = CommunityCreateForm()
     return render(request, "create-community.html", {"form": CommunityCreateForm})
+
+def Reply(request, **kwargs):
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            form = CommentForm(request.POST)
+            
+            if form.is_valid():
+                print(form.cleaned_data, kwargs["community"], kwargs["post_pk"], kwargs["pk"])
+                comment_instance = Comment(
+                    content=form.cleaned_data["content"],
+                    author=request.user,
+                    parent_post=Post.objects.get(pk=kwargs['post_pk']),
+                    parent_comment=Comment.objects.get(pk=kwargs["pk"]),
+                )
+                
+                comment_instance.save()
+                return redirect(
+                    f"/c/{kwargs['community']}/{kwargs['post_pk']}"
+                )
+        else:
+            redirect("/")
+    else:
+        return redirect("/")
