@@ -3,6 +3,7 @@ from django.shortcuts import render, HttpResponseRedirect, redirect
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin
+from django.http import HttpResponse
 from .models import Post, Community, Comment
 
 
@@ -132,3 +133,13 @@ def Reply(request, **kwargs):
             redirect("/")
     else:
         return redirect("/")
+
+def DeleteComment(request, **kwargs):
+    if request.user.is_authenticated:
+        if request.user.pk == Comment.objects.get(pk=kwargs["pk"]).author.pk or request.user.is_superuser == True:
+            Comment.objects.get(pk=kwargs["pk"]).delete()
+            return redirect(f"/c/{kwargs['community']}/{kwargs['post_pk']}")
+        else:
+            return HttpResponse("Not allowed")
+    else:
+        return HttpResponse("Not allowed")

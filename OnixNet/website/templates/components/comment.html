@@ -8,9 +8,13 @@
         {% if user.is_authenticated %}
         <br>
   <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#commentform{{ i.pk }}" aria-expanded="false" aria-controls="commentform{{ i.pk }}">
-    <img src="{% static 'icons/gray/outline/messages.svg' %}">
+    <img src="{% static 'icons/custom/outline/messages.svg' %}" alt="Comment">
   </button>
-
+  {% if user.pk == i.author.pk or user.is_superuser %}
+  <a class="btn" href="/c/{{ object.community }}/{{object.pk }}/delete/{{ i.pk }}">
+    <img src="{% static 'icons/custom/outline/xbox-x.svg' %}" alt="Delete comment">
+  </a>
+  {% endif %}
         <div class="collapse" id="commentform{{ i.pk }}">
         <form action="/c/{{ object.community }}/{{ object.pk }}/reply/{{ i.pk }}" method="post">
             {% csrf_token %}
