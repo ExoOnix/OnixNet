@@ -32,17 +32,6 @@
 
                 {{ i.author }} - {{ i.created_at|timesince }} ago<br>
                 {{ i.content }}
-                <br>
-                {% for j in replys %}
-                {% if i.pk == j.pk %}
-                <div class="card mt-1">
-                <div class="card-body">
-                {{ j.author }} - {{ j.created_at|timesince }} ago<br>
-                {{ j.content }}
-                </div>
-                </div>
-                {% endif %}
-                {% endfor %}
             </div>
         </div>
         {% endfor %}

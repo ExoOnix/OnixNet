@@ -3,7 +3,7 @@ from django.shortcuts import render, HttpResponseRedirect, redirect
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin
-from .models import Post, Community, Comment, Reply
+from .models import Post, Community, Comment
 
 
 from .forms import UploadForm, CommentForm, CommunityCreateForm
@@ -49,8 +49,7 @@ class PostDetailView(DetailView, FormMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm(initial={'post': self.object})
-        context["comments"] = Comment.objects.filter(post__pk=self.kwargs["pk"]).order_by('-created_at')
-        context["replys"] = Reply.objects.filter(comment__pk=self.kwargs["pk"])
+        context["comments"] = Comment.objects.filter(parent_post__pk=self.kwargs["pk"]).order_by('-created_at')
         return context
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -64,7 +63,7 @@ class PostDetailView(DetailView, FormMixin):
         comment_instance = Comment(
             content=form.cleaned_data["content"],
             author=self.request.user,
-            post=Post.objects.get(pk=self.kwargs['pk']),
+            parent_post=Post.objects.get(pk=self.kwargs['pk']),
         )
         
         comment_instance.save()
