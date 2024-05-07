@@ -9,3 +9,6 @@ class UploadForm(forms.Form):
     )
     title = forms.CharField(label="Title", max_length=200, required=True)
     content = forms.CharField(widget=forms.Textarea(), required=True)
+
+class CommentForm(forms.Form):
+    content = forms.CharField(required=True)

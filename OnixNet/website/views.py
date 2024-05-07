@@ -1,10 +1,12 @@
 from django.utils import timezone
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import render, HttpResponseRedirect, redirect
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
+from django.views.generic.edit import FormMixin
 from .models import Post, Community, Comment, Reply
 
-from .forms import UploadForm
+
+from .forms import UploadForm, CommentForm
 
 class index(ListView):
     model = Post
@@ -26,6 +28,7 @@ class CommunityView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         community = Community.objects.filter(name=self.kwargs["community"])
+
         if len(community) > 0:
             context["community"] = community[0]
             context["exists"] = True
@@ -36,15 +39,38 @@ class CommunityView(ListView):
         return Post.objects.filter(community__name=self.kwargs["community"])
 
 
-class PostDetailView(DetailView):
+class PostDetailView(DetailView, FormMixin):
     model = Post
     template_name = "post_detail.html"
+    form_class = CommentForm
+    def get_success_url(self):
+        return redirect(".")
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["comments"] = Comment.objects.filter(post__pk=self.kwargs["pk"])
+        context['form'] = CommentForm(initial={'post': self.object})
+        context["comments"] = Comment.objects.filter(post__pk=self.kwargs["pk"]).order_by('-created_at')
         context["replys"] = Reply.objects.filter(comment__pk=self.kwargs["pk"])
         return context
-
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+    def form_valid(self, form):
+        print(form.cleaned_data)
+        comment_instance = Comment(
+            content=form.cleaned_data["content"],
+            author=self.request.user,
+            post=Post.objects.get(pk=self.kwargs['pk']),
+        )
+        
+        comment_instance.save()
+        return HttpResponseRedirect(
+            f"/c/{self.kwargs['community']}/{self.kwargs['pk']}"
+        )
 def Upload(request):
     if request.method == "POST":
         form = UploadForm(request.POST)
