@@ -49,7 +49,7 @@ class PostDetailView(DetailView, FormMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm(initial={'post': self.object})
-        context["comments"] = Comment.objects.filter(parent_post__pk=self.kwargs["pk"]).order_by('-created_at')
+        context["comments"] = Comment.objects.filter(parent_post__pk=self.kwargs["pk"], parent_comment=None).order_by('-created_at')
         return context
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
