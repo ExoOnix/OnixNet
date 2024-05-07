@@ -26,7 +26,7 @@ class Post(models.Model):
 class Comment(models.Model):
     content = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    parent_post = models.ForeignKey(Post, on_delete=models.CASCADE, default=None, null=True)
+    parent_post = models.ForeignKey(Post, on_delete=models.CASCADE)
     parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, default=None, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
