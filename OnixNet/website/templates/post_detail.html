@@ -10,12 +10,35 @@
         <small class="mb-0"><strong><a href="/c/{{object.community}}" class="button-link">{{object.community}}</a></strong> - {{ object.created_at|timesince }} ago</small>
         <br>
         <small>{{ object.author }}</small><br>
-        {% if object.attachments %}
-        {% for attachment in object.attachments.all %}
-        <img src="{{ attachment.image.url }}">
-        {% endfor %}
-        {% endif %}
         <h1>{{ object.title }}</h1>
+        {% if object.attachments %}
+        <center>
+        <div id="carouselExample" class="carousel slide">
+  <div class="carousel-inner">
+{% for attachment in post.attachments.all %}
+    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        {% if attachment.image %}
+        <img src="{{ attachment.image.url }}", class="d-block w-25">
+        {% else %}
+        <video class="d-block w-25" controls>
+        <source src="{{ attachment.video.url }}" type="video/mp4">
+        Your browser does not support the video tag.
+        </video>
+        {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+</center>
+        {% endif %}
         <p>{{ object.content }}</p>
     </div>
 </div>
