@@ -4,11 +4,11 @@
 <div class="card w-75 center mt-4" style="width: 18rem; height: 75vh">
     <div class="card-body">
         <center><h1>Upload</h1></center>
-        <form action="{% url 'upload' %}" method="post">
+        <form enctype="multipart/form-data" action="{% url 'upload' %}" method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Submit" class="btn btn-success">
-        </form>
+        </>
     </div>
 </div>
 

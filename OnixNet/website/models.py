@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
+
 User = get_user_model()
 
 class Community(models.Model):
@@ -33,4 +34,9 @@ class Comment(models.Model):
     def __str__(self):
         return str(self.author)
 
+
+class Attachment(models.Model):
+    image = models.ImageField("Attachment", upload_to="attachments/", null=True, default=None)
+    video = models.FileField("Attachment", upload_to="attachments/", null=True, default=None)
+    parent_post = models.ForeignKey(Post, on_delete=models.CASCADE)
 

@@ -4,7 +4,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin
 from django.http import HttpResponse
-from .models import Post, Community, Comment
+from .models import Post, Community, Comment, Attachment
 
 
 from .forms import UploadForm, CommentForm, CommunityCreateForm
@@ -73,10 +73,10 @@ class PostDetailView(DetailView, FormMixin):
         )
 def Upload(request):
     if request.method == "POST":
-        form = UploadForm(request.POST)
+        form = UploadForm(request.POST, request.FILES)
+        print(form.errors.as_text)
         if form.is_valid():
 
-            print(form.cleaned_data)
             post_instance = Post(
                 title=form.cleaned_data["title"],
                 content=form.cleaned_data["content"],
@@ -84,6 +84,10 @@ def Upload(request):
                 community=Community.objects.get(id=form.cleaned_data["community"].id),
             )
             post_instance.save()
+            print(form.cleaned_data)
+            files = form.cleaned_data["file_field"]
+            for f in files:
+                pass
             return HttpResponseRedirect(f"/c/{Community.objects.get(id=form.cleaned_data['community'].id).name}/{post_instance.pk}")
 
     # if a GET (or any other method) we'll create a blank form
