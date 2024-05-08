@@ -1,4 +1,6 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from .views import index, PostDetailView, CommunityView
 
 from . import views
@@ -12,3 +14,5 @@ urlpatterns = [
     path("c/<str:community>/<str:post_pk>/reply/<int:pk>", views.Reply, name="reply"),
     path("c/<str:community>/<str:post_pk>/delete/<int:pk>", views.DeleteComment, name="delete"),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -9,7 +9,12 @@
         <a href="{% url 'index' %}"><img src="{% static 'icons/custom/outline/arrow-left.svg' %}" alt="Back"></a>
         <small class="mb-0"><strong><a href="/c/{{object.community}}" class="button-link">{{object.community}}</a></strong> - {{ object.created_at|timesince }} ago</small>
         <br>
-        <small>{{ object.author }}</small>
+        <small>{{ object.author }}</small><br>
+        {% if object.attachments %}
+        {% for attachment in object.attachments.all %}
+        <img src="{{ attachment.image.url }}">
+        {% endfor %}
+        {% endif %}
         <h1>{{ object.title }}</h1>
         <p>{{ object.content }}</p>
     </div>
