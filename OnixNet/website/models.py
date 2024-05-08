@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
 
 User = get_user_model()
@@ -36,7 +37,12 @@ class Comment(models.Model):
 
 
 class Attachment(models.Model):
-    image = models.ImageField("Attachment", upload_to="attachments/", null=True, default=None)
-    video = models.FileField("Attachment", upload_to="attachments/", null=True, default=None)
+    image = models.ImageField(upload_to="attachments/", null=True, default=None)
+    video = models.FileField(upload_to="attachments/", null=True, default=None)
     parent_post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
+    def clean(self):
+        if self.video and self.image:
+            raise ValidationError("Please select only a video OR an image, not both.")
+    def __str__(self):
+        return str(self.parent_post)
