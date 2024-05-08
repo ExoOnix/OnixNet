@@ -37,7 +37,7 @@ class CommunityView(ListView):
             context["exists"] = False
         return context
     def get_queryset(self):
-        return Post.objects.filter(community__name=self.kwargs["community"])
+        return Post.objects.filter(community__name=self.kwargs["community"]).order_by('-created_at')
 
 
 class PostDetailView(DetailView, FormMixin):

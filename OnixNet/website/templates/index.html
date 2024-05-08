@@ -6,7 +6,7 @@
         <div class="card-body">
             <h5 class="card-title">{{ post }}</h5>
             <h6 class="card-subtitle mb-2 text-body-secondary"><a class="button-link" href="/c/{{ post.community }}">{{ post.community }}</a> - {{ post.author }}</h6>
-            {% if post.attachments %}
+            {% if post.attachments.all|length > 0 %}
         <center>
         <div id="carouselExample" class="carousel slide">
   <div class="carousel-inner">

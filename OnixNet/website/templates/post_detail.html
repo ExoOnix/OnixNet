@@ -11,7 +11,7 @@
         <br>
         <small>{{ object.author }}</small><br>
         <h1>{{ object.title }}</h1>
-        {% if object.attachments %}
+        {% if post.attachments.all|length > 0 %}
         <center>
         <div id="carouselExample" class="carousel slide">
   <div class="carousel-inner">
