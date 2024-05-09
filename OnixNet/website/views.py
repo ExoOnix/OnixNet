@@ -119,6 +119,9 @@ def CreateCommunity(request):
                     admin=request.user,
                 )
                 community_instance.save()
+                community_instance.members.add(request.user)
+                community_instance.save()
+
                 return HttpResponseRedirect(
                     f"/c/{form.cleaned_data['name']}"
                 )

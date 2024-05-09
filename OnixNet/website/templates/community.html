@@ -8,7 +8,7 @@
 <center><p>{{ community.description }}</p></center>
 {% if community.name not in user.communities.all|join:", " %}
 <center><a class="btn btn-outline-success" href="/c/{{ community.name }}/join">Join Community</a></center>
-{% else %}
+{% elif community.name in user.communities.all|join:", " and community.admin != user %}
 <center><a class="btn btn-outline-danger" href="/c/{{ community.name }}/leave">Leave Community</a></center>
 {% endif %}
 {% endif %}
