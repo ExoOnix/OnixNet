@@ -19,7 +19,12 @@ class index(ListView):
         context["now"] = timezone.now()
         return context
     def get_queryset(self):
-        return Post.objects.all().order_by('-created_at')
+        search = self.request.GET.get('search')
+        if search:
+            object_list = Post.objects.filter(title__icontains=search).order_by('-created_at')
+        else:
+            object_list = Post.objects.all().order_by("-created_at")
+        return object_list
 
 class CommunityView(ListView):
     model = Post
