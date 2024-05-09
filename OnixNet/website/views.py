@@ -160,3 +160,17 @@ def DeleteComment(request, **kwargs):
             return HttpResponse("Not allowed")
     else:
         return HttpResponse("Not allowed")
+
+
+def DeletePost(request, **kwargs):
+    if request.user.is_authenticated:
+        if (
+            request.user.pk == Post.objects.get(pk=kwargs["pk"]).author.pk
+            or request.user.is_superuser == True
+        ):
+            Post.objects.get(pk=kwargs["pk"]).delete()
+            return redirect(f"/c/{kwargs['community']}")
+        else:
+            return HttpResponse("Not allowed")
+    else:
+        return HttpResponse("Not allowed")

@@ -6,6 +6,11 @@
 
 <div class="card w-75 center-x mt-4 overflow-auto" style="width: 18rem; height: 75vh">
     <div class="card-body">
+        {% if user.pk == object.author.pk or user.is_superuser %}
+            <a class="btn" href="/c/{{ object.community }}/{{object.pk }}/delete" style="position: absolute; right: 0px;">
+                <img src="{% static 'icons/custom/outline/xbox-x.svg' %}" alt="Delete comment">
+            </a>
+        {% endif %}
         <a href="{% url 'index' %}"><img src="{% static 'icons/custom/outline/arrow-left.svg' %}" alt="Back"></a>
         <small class="mb-0"><strong><a href="/c/{{object.community}}" class="button-link">{{object.community}}</a></strong> - {{ object.created_at|timesince }} ago</small>
         <br>
@@ -18,9 +23,9 @@
 {% for attachment in post.attachments.all %}
     <div class="carousel-item {% if forloop.first %}active{% endif %}">
         {% if attachment.image %}
-        <img src="{{ attachment.image.url }}", class="d-block w-25">
+        <img src="{{ attachment.image.url }}", class="d-block attachment-photo">
         {% else %}
-        <video class="d-block w-25" controls>
+        <video class="d-block w-75" controls>
         <source src="{{ attachment.video.url }}" type="video/mp4">
         Your browser does not support the video tag.
         </video>

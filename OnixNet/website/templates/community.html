@@ -6,6 +6,7 @@
 {% else %}
 <center><h1>{{ community.name }}</h1></center>
 <center><p>{{ community.description }}</p></center>
+
 {% endif %}
 
 {% for post in page_obj %}
@@ -21,9 +22,9 @@
     {% for attachment in post.attachments.all %}
     <div class="carousel-item {% if forloop.first %}active{% endif %}">
         {% if attachment.image %}
-        <img src="{{ attachment.image.url }}", class="d-block w-25">
+        <img src="{{ attachment.image.url }}", class="d-block attachments-photo">
         {% else %}
-        <video class="d-block w-25" controls>
+        <video class="d-block w-75" controls>
         <source src="{{ attachment.video.url }}" type="video/mp4">
         Your browser does not support the video tag.
         </video>

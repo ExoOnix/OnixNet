@@ -9,7 +9,16 @@
         left: 50%;
         transform: translateX(-70%);
     }
+    .attachment-photo {
+        width: 75%;
+    }
 }
+
+.attachment-photo {
+    width: 50%;
+}
+
+
 
 .button-link {
     text-decoration: none;
