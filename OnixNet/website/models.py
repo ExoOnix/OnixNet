@@ -38,8 +38,8 @@ class Comment(models.Model):
 
 
 class Attachment(models.Model):
-    image = models.ImageField(upload_to="media/attachments/", null=True, default=None)
-    video = models.FileField(upload_to="media/attachments/", null=True, default=None)
+    image = models.ImageField(upload_to="attachments/", null=True, default=None)
+    video = models.FileField(upload_to="attachments/", null=True, default=None)
     parent_post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="attachments")
 
     def clean(self):
