@@ -6,6 +6,17 @@
         <center><h1>Upload</h1></center>
         <form enctype="multipart/form-data" action="{% url 'upload' %}" method="post">
             {% csrf_token %}
+            <p>
+            <label for="id_community">Community:</label>
+            <select name="community" required="" id="id_community">
+            <option value="" selected="">---------</option>
+            {% for community in communities %}
+            <option value="{{ community.pk }}">{{ community.name }}</option>
+            {% endfor %}
+            </select>
+                
+                
+            </p>
             {{ form.as_p }}
             <input type="submit" value="Submit" class="btn btn-success">
         </>

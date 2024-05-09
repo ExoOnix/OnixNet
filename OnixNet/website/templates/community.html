@@ -6,7 +6,11 @@
 {% else %}
 <center><h1>{{ community.name }}</h1></center>
 <center><p>{{ community.description }}</p></center>
-
+{% if community.name not in user.communities.all|join:", " %}
+<center><a class="btn btn-outline-success" href="/c/{{ community.name }}/join">Join Community</a></center>
+{% else %}
+<center><a class="btn btn-outline-danger" href="/c/{{ community.name }}/leave">Leave Community</a></center>
+{% endif %}
 {% endif %}
 
 {% for post in page_obj %}

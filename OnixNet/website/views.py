@@ -76,12 +76,11 @@ def Upload(request):
         form = UploadForm(request.POST, request.FILES)
         print(form.errors.as_text)
         if form.is_valid():
-
             post_instance = Post(
                 title=form.cleaned_data["title"],
                 content=form.cleaned_data["content"],
                 author=request.user,
-                community=Community.objects.get(id=form.cleaned_data["community"].id),
+                community=Community.objects.get(id=int(request.POST.get("community"))),
             )
             post_instance.save()
             print("cleaned data", form.cleaned_data)
@@ -101,12 +100,12 @@ def Upload(request):
                             video=f
                         )
                         attachment_instance.save()
-            return HttpResponseRedirect(f"/c/{Community.objects.get(id=form.cleaned_data['community'].id).name}/{post_instance.pk}")
+            return HttpResponseRedirect(f"/c/{Community.objects.get(id=int(request.POST.get('community'))).name}/{post_instance.pk}")
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = UploadForm()
-    return render(request, "upload.html", {"form": UploadForm})
+    return render(request, "upload.html", {"form": UploadForm, "communities": request.user.communities.all()})
 
 def CreateCommunity(request):
     if request.method == "POST":
@@ -172,5 +171,25 @@ def DeletePost(request, **kwargs):
             return redirect(f"/c/{kwargs['community']}")
         else:
             return HttpResponse("Not allowed")
+    else:
+        return HttpResponse("Not allowed")
+
+
+def JoinCommunity(request, **kwargs):
+    if request.user.is_authenticated:
+        community = Community.objects.get(name=kwargs["community"])
+        community.members.add(request.user)
+        community.save()
+        return redirect(f"/c/{kwargs['community']}")
+    else:
+        return HttpResponse("Not allowed")
+
+
+def LeaveCommunity(request, **kwargs):
+    if request.user.is_authenticated:
+        community = Community.objects.get(name=kwargs["community"])
+        community.members.remove(request.user)
+        community.save()
+        return redirect(f"/c/{kwargs['community']}")
     else:
         return HttpResponse("Not allowed")
