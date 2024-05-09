@@ -72,6 +72,7 @@
                             <li>
                                 {% if user.is_authenticated %}
                                 Logged in as <strong>{{ user.username }}</strong>
+                                <a href="{% url 'password_change' %}" class="button-link mt-1">Change Password</a>
                                 <a href="{% url 'logout'%}" class="button-link mt-1">Logout</a>
                                 {% else %}
                                 <a href="{% url 'login'%}" class="button-link mt-1">Login</a>
