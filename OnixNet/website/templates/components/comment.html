@@ -6,7 +6,7 @@
     {{ i.content | markdown | safe }}
     
         {% if user.is_authenticated %}
-        <br>
+
   <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#commentform{{ i.pk }}" aria-expanded="false" aria-controls="commentform{{ i.pk }}">
     <img src="{% static 'icons/custom/outline/messages.svg' %}" alt="Comment">
   </button>
