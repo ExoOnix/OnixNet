@@ -4,7 +4,10 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin
 from django.http import HttpResponse
+from django.core.exceptions import PermissionDenied
+
 import filetype
+
 
 from .models import Post, Community, Comment, Attachment
 from .forms import UploadForm, CommentForm, CommunityCreateForm
@@ -76,70 +79,77 @@ class PostDetailView(DetailView, FormMixin):
         return HttpResponseRedirect(
             f"/c/{self.kwargs['community']}/{self.kwargs['pk']}"
         )
+
+
 def Upload(request):
-    if request.method == "POST":
-        form = UploadForm(request.POST, request.FILES)
-        print(form.errors.as_text)
-        if form.is_valid():
-            post_instance = Post(
-                title=form.cleaned_data["title"],
-                content=form.cleaned_data["content"],
-                author=request.user,
-                community=Community.objects.get(id=int(request.POST.get("community"))),
-            )
-            post_instance.save()
-            print("cleaned data", form.cleaned_data)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            form = UploadForm(request.POST, request.FILES)
+            print(form.errors.as_text)
+            if form.is_valid():
+                post_instance = Post(
+                    title=form.cleaned_data["title"],
+                    content=form.cleaned_data["content"],
+                    author=request.user,
+                    community=Community.objects.get(id=int(request.POST.get("community"))),
+                )
+                post_instance.save()
+                print("cleaned data", form.cleaned_data)
 
-            if len(form.cleaned_data["attachments"]) > 0:
-                files = form.cleaned_data["attachments"]
-                for f in files:
-                    if "image" in filetype.guess(f).mime:
-                        attachment_instance = Attachment(
-                            parent_post=post_instance,
-                            image=f
-                        )
-                        attachment_instance.save()
-                    if "video" in filetype.guess(f).mime:
-                        attachment_instance = Attachment(
-                            parent_post=post_instance,
-                            video=f
-                        )
-                        attachment_instance.save()
-            return HttpResponseRedirect(f"/c/{Community.objects.get(id=int(request.POST.get('community'))).name}/{post_instance.pk}")
+                if len(form.cleaned_data["attachments"]) > 0:
+                    files = form.cleaned_data["attachments"]
+                    for f in files:
+                        if "image" in filetype.guess(f).mime:
+                            attachment_instance = Attachment(
+                                parent_post=post_instance,
+                                image=f
+                            )
+                            attachment_instance.save()
+                        if "video" in filetype.guess(f).mime:
+                            attachment_instance = Attachment(
+                                parent_post=post_instance,
+                                video=f
+                            )
+                            attachment_instance.save()
+                return HttpResponseRedirect(f"/c/{Community.objects.get(id=int(request.POST.get('community'))).name}/{post_instance.pk}")
 
-    # if a GET (or any other method) we'll create a blank form
+        # if a GET (or any other method) we'll create a blank form
+        else:
+            form = UploadForm()
+        return render(request, "upload.html", {"form": UploadForm, "communities": request.user.communities.all()})
     else:
-        form = UploadForm()
-    return render(request, "upload.html", {"form": UploadForm, "communities": request.user.communities.all()})
-
+        raise PermissionDenied
 def CreateCommunity(request):
-    if request.method == "POST":
-        form = CommunityCreateForm(request.POST)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            form = CommunityCreateForm(request.POST)
 
-        if form.is_valid():
-            if not Community.objects.filter(name=form.cleaned_data["name"]).exists():
-                community_instance = Community(
-                    name=form.cleaned_data["name"],
-                    description=form.cleaned_data["description"],
-                    admin=request.user,
-                )
-                community_instance.save()
-                community_instance.members.add(request.user)
-                community_instance.save()
+            if form.is_valid():
+                if not Community.objects.filter(name=form.cleaned_data["name"]).exists():
+                    community_instance = Community(
+                        name=form.cleaned_data["name"],
+                        description=form.cleaned_data["description"],
+                        admin=request.user,
+                    )
+                    community_instance.save()
+                    community_instance.members.add(request.user)
+                    community_instance.save()
 
-                return HttpResponseRedirect(
-                    f"/c/{form.cleaned_data['name']}"
-                )
+                    return HttpResponseRedirect(
+                        f"/c/{form.cleaned_data['name']}"
+                    )
 
+        else:
+            form = CommunityCreateForm()
+        return render(request, "create-community.html", {"form": CommunityCreateForm})
     else:
-        form = CommunityCreateForm()
-    return render(request, "create-community.html", {"form": CommunityCreateForm})
+        raise PermissionDenied
 
 def Reply(request, **kwargs):
     if request.user.is_authenticated:
         if request.method == "POST":
             form = CommentForm(request.POST)
-            
+
             if form.is_valid():
                 print(form.cleaned_data, kwargs["community"], kwargs["post_pk"], kwargs["pk"])
                 comment_instance = Comment(
@@ -148,7 +158,7 @@ def Reply(request, **kwargs):
                     parent_post=Post.objects.get(pk=kwargs['post_pk']),
                     parent_comment=Comment.objects.get(pk=kwargs["pk"]),
                 )
-                
+
                 comment_instance.save()
                 return redirect(
                     f"/c/{kwargs['community']}/{kwargs['post_pk']}"
@@ -156,7 +166,8 @@ def Reply(request, **kwargs):
         else:
             redirect("/")
     else:
-        return redirect("/")
+        raise PermissionDenied
+
 
 def DeleteComment(request, **kwargs):
     if request.user.is_authenticated:
@@ -164,9 +175,9 @@ def DeleteComment(request, **kwargs):
             Comment.objects.get(pk=kwargs["pk"]).delete()
             return redirect(f"/c/{kwargs['community']}/{kwargs['post_pk']}")
         else:
-            return HttpResponse("Not allowed")
+            raise PermissionDenied
     else:
-        return HttpResponse("Not allowed")
+        raise PermissionDenied
 
 
 def DeletePost(request, **kwargs):
@@ -178,9 +189,9 @@ def DeletePost(request, **kwargs):
             Post.objects.get(pk=kwargs["pk"]).delete()
             return redirect(f"/c/{kwargs['community']}")
         else:
-            return HttpResponse("Not allowed")
+            raise PermissionDenied
     else:
-        return HttpResponse("Not allowed")
+        raise PermissionDenied
 
 
 def JoinCommunity(request, **kwargs):
@@ -190,7 +201,7 @@ def JoinCommunity(request, **kwargs):
         community.save()
         return redirect(f"/c/{kwargs['community']}")
     else:
-        return HttpResponse("Not allowed")
+        raise PermissionDenied
 
 
 def LeaveCommunity(request, **kwargs):
@@ -200,4 +211,4 @@ def LeaveCommunity(request, **kwargs):
         community.save()
         return redirect(f"/c/{kwargs['community']}")
     else:
-        return HttpResponse("Not allowed")
+        raise PermissionDenied
