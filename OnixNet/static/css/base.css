@@ -43,3 +43,7 @@
     left: 50%;
     transform: translateX(-50%);
 }
+
+.comment-content {
+    overflow: auto;
+}

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 {% load static %}
-
+{% load markdown_extras %}
 
 
 <div class="card w-75 center-x mt-4 overflow-auto" style="width: 18rem; height: 75vh">
@@ -44,7 +44,7 @@
 </div>
 </center>
         {% endif %}
-        <p>{{ object.content }}</p>
+        <p>{{ object.content|markdown|safe}}</p>
     </div>
 </div>
 

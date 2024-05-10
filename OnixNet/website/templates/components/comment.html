@@ -1,9 +1,9 @@
 {% load static %}
+{% load markdown_extras %}
 <div class="card mt-1">
-    <div class="card-body">
-
+    <div class="card-body comment-content">
     {{ i.author }} - {{ i.created_at|timesince }} ago<br>
-    {{ i.content }}
+    {{ i.content | markdown | safe }}
     
         {% if user.is_authenticated %}
         <br>
