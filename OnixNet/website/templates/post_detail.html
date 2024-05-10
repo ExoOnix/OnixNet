@@ -3,6 +3,8 @@
 {% load static %}
 {% load markdown_extras %}
 
+{% autoescape on %}
+
 
 <div class="card w-75 center-x mt-4 overflow-auto" style="width: 18rem; height: 75vh">
     <div class="card-body">
@@ -14,7 +16,7 @@
         <a href="{% url 'index' %}"><img src="{% static 'icons/custom/outline/arrow-left.svg' %}" alt="Back"></a>
         <small class="mb-0"><strong><a href="/c/{{object.community}}" class="button-link">{{object.community}}</a></strong> - {{ object.created_at|timesince }} ago</small>
         <br>
-        <small>{{ object.author }}</small><br>
+        <small>{{ object.author  }}</small><br>
         <h1>{{ object.title }}</h1>
         {% if post.attachments.all|length > 0 %}
         <center>
@@ -44,7 +46,7 @@
 </div>
 </center>
         {% endif %}
-        <p>{{ object.content|markdown|safe}}</p>
+        <p>{{ object.content|markdown }}</p>
     </div>
 </div>
 
@@ -67,4 +69,5 @@
     </div>
 </div>
 
+{% endautoescape %}
 {% endblock %}

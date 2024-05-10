@@ -1,9 +1,11 @@
 {% load static %}
 {% load markdown_extras %}
+
+{% autoescape on %}
 <div class="card mt-1">
     <div class="card-body comment-content">
     {{ i.author }} - {{ i.created_at|timesince }} ago<br>
-    {{ i.content | markdown | safe }}
+    {{ i.content | markdown  }}
     
         {% if user.is_authenticated %}
 
@@ -32,3 +34,4 @@
     </div>
 </div>
 
+{% endautoescape %}
