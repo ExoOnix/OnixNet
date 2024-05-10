@@ -14,6 +14,8 @@ urlpatterns = [
     path("c/<str:community>/join", views.JoinCommunity, name="join-community"),
     path("c/<str:community>/leave", views.LeaveCommunity, name="leave-community"),
     path("c/<str:community>/<int:pk>/", PostDetailView.as_view(), name="post-detail"),
+    path("c/<str:community>/<int:pk>/upvote", views.UpvotePost, name="upvote-post"),
+    path("c/<str:community>/<int:pk>/downvote", views.DownvotePost, name="upvote-post"),
     path("c/<str:community>/<str:post_pk>/reply/<int:pk>", views.Reply, name="reply"),
     path(
         "c/<str:community>/<str:post_pk>/delete/<int:pk>",

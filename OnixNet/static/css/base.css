@@ -47,3 +47,7 @@
 .comment-content {
     overflow: auto;
 }
+
+.selected-vote {
+    filter: invert(6%) sepia(90%) saturate(6551%) hue-rotate(2deg) brightness(92%) contrast(107%);
+}

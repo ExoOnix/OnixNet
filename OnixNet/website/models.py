@@ -22,6 +22,9 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     community = models.ForeignKey(Community, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    upvote = models.ManyToManyField(User, related_name="upvotes", blank=True)
+    downvote = models.ManyToManyField(User, related_name="downvotes", blank=True)
+
 
     def __str__(self):
         return self.title

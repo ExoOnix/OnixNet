@@ -212,3 +212,32 @@ def LeaveCommunity(request, **kwargs):
         return redirect(f"/c/{kwargs['community']}")
     else:
         raise PermissionDenied
+
+
+def UpvotePost(request, **kwargs):
+    if request.user.is_authenticated:
+        if request.user.upvotes.filter(pk=kwargs["pk"]).exists():
+            post = Post.objects.get(pk=kwargs["pk"])
+            post.upvote.remove(request.user)
+            post.save()
+        elif not request.user.downvotes.filter(pk=kwargs["pk"]).exists():
+            post = Post.objects.get(pk=kwargs["pk"])
+            post.upvote.add(request.user)
+            post.save()
+        return redirect(f"/c/{kwargs['community']}/{kwargs["pk"]}")
+    else:
+        raise PermissionDenied
+
+def DownvotePost(request, **kwargs):
+    if request.user.is_authenticated:
+        if request.user.downvotes.filter(pk=kwargs["pk"]).exists():
+            post = Post.objects.get(pk=kwargs["pk"])
+            post.downvote.remove(request.user)
+            post.save()
+        elif not request.user.upvotes.filter(pk=kwargs["pk"]).exists():
+            post = Post.objects.get(pk=kwargs["pk"])
+            post.downvote.add(request.user)
+            post.save()
+        return redirect(f"/c/{kwargs['community']}/{kwargs["pk"]}")
+    else:
+        raise PermissionDenied
