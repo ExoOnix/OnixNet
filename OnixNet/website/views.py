@@ -224,7 +224,7 @@ def UpvotePost(request, **kwargs):
             post = Post.objects.get(pk=kwargs["pk"])
             post.upvote.add(request.user)
             post.save()
-        return redirect(f"/c/{kwargs['community']}/{kwargs["pk"]}")
+        return redirect(f"/c/{kwargs['community']}/{kwargs['pk']}")
     else:
         raise PermissionDenied
 
@@ -238,6 +238,6 @@ def DownvotePost(request, **kwargs):
             post = Post.objects.get(pk=kwargs["pk"])
             post.downvote.add(request.user)
             post.save()
-        return redirect(f"/c/{kwargs['community']}/{kwargs["pk"]}")
+        return redirect(f"/c/{kwargs['community']}/{kwargs['pk']}")
     else:
         raise PermissionDenied
