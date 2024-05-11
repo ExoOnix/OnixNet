@@ -9,7 +9,7 @@ from django.core.exceptions import PermissionDenied
 import filetype
 
 
-from .models import Post, Community, Comment, Attachment
+from .models import Post, Community, Comment, Attachment, UserUpvote, UserDownvote
 from .forms import UploadForm, CommentForm, CommunityCreateForm
 
 class index(ListView):
