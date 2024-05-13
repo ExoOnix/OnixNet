@@ -23,24 +23,19 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     community = models.ForeignKey(Community, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    upvote = models.ManyToManyField(User, related_name="upvotes", through="UserUpvote", blank=True)
-    downvote = models.ManyToManyField(User, related_name="downvotes", through="UserDownvote", blank=True)
+
 
     def __str__(self):
         return self.title
 
 
-class UserUpvote(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey("Post", on_delete=models.CASCADE)
-    upvoted_at = models.DateTimeField(default=timezone.now)
-
-
-class UserDownvote(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey("Post", on_delete=models.CASCADE)
-    upvoted_at = models.DateTimeField(default=timezone.now)
-
+class Reaction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reactions")
+    parent_post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="reactions")
+    vote = models.BooleanField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return str(self.user)
 
 class Comment(models.Model):
     content = models.TextField()

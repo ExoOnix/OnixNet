@@ -8,9 +8,20 @@ from django.core.exceptions import PermissionDenied
 
 import filetype
 
+# Reccomendation
+import pandas as pd
+import numpy as np
+import scipy.stats
 
-from .models import Post, Community, Comment, Attachment, UserUpvote, UserDownvote
+# Similarity
+from sklearn.metrics.pairwise import cosine_similarity
+
+from .models import Post, Community, Comment, Attachment, Reaction
 from .forms import UploadForm, CommentForm, CommunityCreateForm
+
+class Reccomendation():
+    def Update(self):
+        pass
 
 class index(ListView):
     model = Post
@@ -59,6 +70,12 @@ class PostDetailView(DetailView, FormMixin):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm(initial={'post': self.object})
         context["comments"] = Comment.objects.filter(parent_post__pk=self.kwargs["pk"]).order_by('-created_at')
+        context["upvotes"] = Reaction.objects.filter(parent_post=self.kwargs["pk"], vote=True)
+        context["downvotes"] = Reaction.objects.filter(parent_post=self.kwargs["pk"], vote=False)
+        if self.request.user.is_authenticated:
+            context["is_upvote"] = Reaction.objects.filter(parent_post=self.kwargs["pk"], vote=True, user=self.request.user)
+            context["is_downvote"] = Reaction.objects.filter(parent_post=self.kwargs["pk"], vote=False, user=self.request.user)
+
         return context
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -74,7 +91,7 @@ class PostDetailView(DetailView, FormMixin):
             author=self.request.user,
             parent_post=Post.objects.get(pk=self.kwargs['pk']),
         )
-        
+
         comment_instance.save()
         return HttpResponseRedirect(
             f"/c/{self.kwargs['community']}/{self.kwargs['pk']}"
@@ -216,28 +233,36 @@ def LeaveCommunity(request, **kwargs):
 
 def UpvotePost(request, **kwargs):
     if request.user.is_authenticated:
-        if request.user.upvotes.filter(pk=kwargs["pk"]).exists():
-            post = Post.objects.get(pk=kwargs["pk"])
-            post.upvote.remove(request.user)
-            post.save()
-        elif not request.user.downvotes.filter(pk=kwargs["pk"]).exists():
-            post = Post.objects.get(pk=kwargs["pk"])
-            post.upvote.add(request.user)
-            post.save()
+        reaction = Reaction.objects.filter(
+            parent_post=kwargs["pk"], user=request.user
+        )
+        if len(reaction) > 0:
+            reaction.delete()
+        else:
+            reaction = Reaction(
+                user=request.user,
+                parent_post=Post.objects.get(pk=kwargs["pk"]),
+                vote=True
+            )
+            reaction.save()
         return redirect(f"/c/{kwargs['community']}/{kwargs['pk']}")
     else:
         raise PermissionDenied
 
 def DownvotePost(request, **kwargs):
     if request.user.is_authenticated:
-        if request.user.downvotes.filter(pk=kwargs["pk"]).exists():
-            post = Post.objects.get(pk=kwargs["pk"])
-            post.downvote.remove(request.user)
-            post.save()
-        elif not request.user.upvotes.filter(pk=kwargs["pk"]).exists():
-            post = Post.objects.get(pk=kwargs["pk"])
-            post.downvote.add(request.user)
-            post.save()
+        reaction = Reaction.objects.filter(
+            parent_post=kwargs["pk"], user=request.user
+        )
+        if len(reaction) > 0:
+            reaction.delete()
+        else:
+            reaction = Reaction(
+                user=request.user,
+                parent_post=Post.objects.get(pk=kwargs["pk"]),
+                vote=False
+            )
+            reaction.save()
         return redirect(f"/c/{kwargs['community']}/{kwargs['pk']}")
     else:
         raise PermissionDenied

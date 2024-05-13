@@ -48,8 +48,14 @@
         {% endif %}
         <p>{{ object.content|markdown }}</p>
         <div class="mt-3">
-            <a class="btn" {% if user.is_authenticated %}href="/c/{{ object.community.name }}/{{ object.pk }}/upvote" {% endif %}><img class="{% if object in user.upvotes.all %}selected-vote{%endif%}" src="{% static 'icons/custom/outline/arrow-up.svg' %}">{{ object.upvote.all|length }}</a>
-            <a class="btn" {% if user.is_authenticated %}href="/c/{{ object.community.name }}/{{ object.pk }}/downvote"{% endif %}><img class="{% if object in user.downvotes.all %}selected-vote{%endif%}" src="{% static 'icons/custom/outline/arrow-down.svg' %}">{{ object.downvote.all|length }}</a>
+            <a class="btn" {% if user.is_authenticated %}href="/c/{{ object.community.name }}/{{ object.pk }}/upvote" {% endif %}>
+                <img class="{% if is_upvote %}selected-vote{% endif %}" src="{% static 'icons/custom/outline/arrow-up.svg' %}">
+                {{ upvotes|length }}
+            </a>
+            <a class="btn" {% if user.is_authenticated %}href="/c/{{ object.community.name }}/{{ object.pk }}/downvote"{% endif %}>
+                <img class="{% if is_downvote %}selected-vote{%endif%}" src="{% static 'icons/custom/outline/arrow-down.svg' %}">
+                {{ downvotes|length }}
+            </a>
         </div>
     </div>
 </div>
