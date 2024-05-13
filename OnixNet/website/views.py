@@ -5,24 +5,22 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin
 from django.http import HttpResponse
 from django.core.exceptions import PermissionDenied
+from .recommend import Recommend
 
 import filetype
 
-# Reccomendation
+# Reccomendations
 import pandas as pd
 import numpy as np
 import scipy.stats
 
-# Similarity
-from sklearn.metrics.pairwise import cosine_similarity
-
 from .models import Post, Community, Comment, Attachment, Reaction
 from .forms import UploadForm, CommentForm, CommunityCreateForm
 
-class Reccomendation():
-    def Update(self):
-        pass
 
+recommend = Recommend()
+recommend.Update()
+# print(recommend.Recommend(1))
 class index(ListView):
     model = Post
     paginate_by = 100
@@ -37,7 +35,24 @@ class index(ListView):
         if search:
             object_list = Post.objects.filter(title__icontains=search).order_by('-created_at')
         else:
-            object_list = Post.objects.all().order_by("-created_at")
+            if self.request.user.is_authenticated:
+                # Fetch recommendations for the authenticated user
+                rec_list = recommend.Recommend(self.request.user.pk).values.tolist()
+                rec_sys = [2]
+                # Extract post IDs from the recommendation list
+                recommended_post_ids = [rec[0] for rec in rec_list]
+                print("recsysys-----------------------------------------", recommended_post_ids)
+                # Fetch posts corresponding to recommended post IDs
+                recommended_posts = Post.objects.filter(pk__in=recommended_post_ids)
+                # Extract remaining post IDs not in the recommendation list
+                remaining_post_ids = [post.id for post in Post.objects.exclude(pk__in=recommended_post_ids)]
+                # Fetch remaining posts
+                remaining_posts = Post.objects.filter(pk__in=remaining_post_ids)
+                
+                # Concatenate recommended posts and remaining posts
+                object_list = recommended_posts.union(remaining_posts, all=True)
+            else:
+                object_list = Post.objects.all().order_by("-created_at")
         return object_list
 
 class CommunityView(ListView):
@@ -128,6 +143,7 @@ def Upload(request):
                                 video=f
                             )
                             attachment_instance.save()
+                            recommend.Update()
                 return HttpResponseRedirect(f"/c/{Community.objects.get(id=int(request.POST.get('community'))).name}/{post_instance.pk}")
 
         # if a GET (or any other method) we'll create a blank form
