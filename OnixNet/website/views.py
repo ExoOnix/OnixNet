@@ -38,10 +38,8 @@ class index(ListView):
             if self.request.user.is_authenticated:
                 # Fetch recommendations for the authenticated user
                 rec_list = recommend.Recommend(self.request.user.pk).values.tolist()
-                rec_sys = [2]
                 # Extract post IDs from the recommendation list
                 recommended_post_ids = [rec[0] for rec in rec_list]
-                print("recsysys-----------------------------------------", recommended_post_ids)
                 # Fetch posts corresponding to recommended post IDs
                 recommended_posts = Post.objects.filter(pk__in=recommended_post_ids)
                 # Extract remaining post IDs not in the recommendation list
@@ -50,7 +48,11 @@ class index(ListView):
                 remaining_posts = Post.objects.filter(pk__in=remaining_post_ids)
                 
                 # Concatenate recommended posts and remaining posts
-                object_list = recommended_posts.union(remaining_posts, all=True)
+                recommended_posts_list = list(recommended_posts)
+                remaining_posts_list = list(remaining_posts.order_by('-created_at'))
+                print(recommended_posts_list, remaining_posts_list)
+                object_list = recommended_posts_list + remaining_posts_list
+                #object_list = recommended_posts.union(remaining_posts, all=True)
             else:
                 object_list = Post.objects.all().order_by("-created_at")
         return object_list
