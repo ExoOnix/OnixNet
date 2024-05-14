@@ -37,22 +37,25 @@ class index(ListView):
         else:
             if self.request.user.is_authenticated:
                 # Fetch recommendations for the authenticated user
-                rec_list = recommend.Recommend(self.request.user.pk).values.tolist()
-                # Extract post IDs from the recommendation list
-                recommended_post_ids = [rec[0] for rec in rec_list]
-                # Fetch posts corresponding to recommended post IDs
-                recommended_posts = Post.objects.filter(pk__in=recommended_post_ids)
-                # Extract remaining post IDs not in the recommendation list
-                remaining_post_ids = [post.id for post in Post.objects.exclude(pk__in=recommended_post_ids)]
-                # Fetch remaining posts
-                remaining_posts = Post.objects.filter(pk__in=remaining_post_ids)
-                
-                # Concatenate recommended posts and remaining posts
-                recommended_posts_list = list(recommended_posts)
-                remaining_posts_list = list(remaining_posts.order_by('-created_at'))
-                print(recommended_posts_list, remaining_posts_list)
-                object_list = recommended_posts_list + remaining_posts_list
-                #object_list = recommended_posts.union(remaining_posts, all=True)
+                try:
+                    rec_list = recommend.Recommend(self.request.user.pk).values.tolist()
+                    # Extract post IDs from the recommendation list
+                    recommended_post_ids = [rec[0] for rec in rec_list]
+                    # Fetch posts corresponding to recommended post IDs
+                    recommended_posts = Post.objects.filter(pk__in=recommended_post_ids)
+                    # Extract remaining post IDs not in the recommendation list
+                    remaining_post_ids = [post.id for post in Post.objects.exclude(pk__in=recommended_post_ids)]
+                    # Fetch remaining posts
+                    remaining_posts = Post.objects.filter(pk__in=remaining_post_ids)
+
+                    # Concatenate recommended posts and remaining posts
+                    recommended_posts_list = list(recommended_posts)
+                    remaining_posts_list = list(remaining_posts.order_by('-created_at'))
+                    print(recommended_posts_list, remaining_posts_list)
+                    object_list = recommended_posts_list + remaining_posts_list
+                    # object_list = recommended_posts.union(remaining_posts, all=True)
+                except:
+                    object_list = Post.objects.all().order_by("-created_at")
             else:
                 object_list = Post.objects.all().order_by("-created_at")
         return object_list

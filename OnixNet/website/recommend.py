@@ -40,7 +40,6 @@ class Recommend():
         self.user_similarity = self.matrix_norm.T.corr()
         self.user_similarity_cosine = cosine_similarity(self.matrix_norm.fillna(0))
     def Recommend(self, picked_userid):
-        print(self.df.head())
         self.user_similarity.drop(index=picked_userid, inplace=True)
         # Number of similar users
         n = 10
