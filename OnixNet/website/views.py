@@ -6,6 +6,7 @@ from django.views.generic.edit import FormMixin
 from django.http import HttpResponse
 from django.core.exceptions import PermissionDenied
 from .recommend import Recommend
+from django.db.models import Count
 
 import filetype
 
@@ -83,20 +84,39 @@ class PostDetailView(DetailView, FormMixin):
     model = Post
     template_name = "post_detail.html"
     form_class = CommentForm
+
     def get_success_url(self):
         return redirect(".")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = CommentForm(initial={'post': self.object})
-        context["comments"] = Comment.objects.filter(parent_post__pk=self.kwargs["pk"]).order_by('-created_at')
-        context["upvotes"] = Reaction.objects.filter(parent_post=self.kwargs["pk"], vote=True)
-        context["downvotes"] = Reaction.objects.filter(parent_post=self.kwargs["pk"], vote=False)
+        context["form"] = CommentForm(initial={"post": self.object})
+
+        # Retrieve comments and annotate them with the count of upvotes
+        comments = (
+            Comment.objects.filter(parent_post__pk=self.kwargs["pk"])
+            .annotate(num_upvotes=Count("upvote"))
+            .order_by("-num_upvotes")
+        )
+
+        context["comments"] = comments
+        context["upvotes"] = Reaction.objects.filter(
+            parent_post=self.kwargs["pk"], vote=True
+        )
+        context["downvotes"] = Reaction.objects.filter(
+            parent_post=self.kwargs["pk"], vote=False
+        )
+
         if self.request.user.is_authenticated:
-            context["is_upvote"] = Reaction.objects.filter(parent_post=self.kwargs["pk"], vote=True, user=self.request.user)
-            context["is_downvote"] = Reaction.objects.filter(parent_post=self.kwargs["pk"], vote=False, user=self.request.user)
+            context["is_upvote"] = Reaction.objects.filter(
+                parent_post=self.kwargs["pk"], vote=True, user=self.request.user
+            )
+            context["is_downvote"] = Reaction.objects.filter(
+                parent_post=self.kwargs["pk"], vote=False, user=self.request.user
+            )
 
         return context
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         form = self.get_form()
