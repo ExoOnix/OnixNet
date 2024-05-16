@@ -34,7 +34,7 @@ class UploadForm(forms.Form):
 
 
 class CommentForm(forms.Form):
-    content = forms.CharField(label="", required=True, widget=forms.Textarea(attrs={'cols': 30, 'rows':1}))
+    content = forms.CharField(label="", required=True)
 
 class CommunityCreateForm(forms.Form):
     name = forms.CharField(label="Name", max_length=50, min_length=2, required=True)

@@ -37,13 +37,15 @@ class Reaction(models.Model):
     def __str__(self):
         return str(self.user)
 
+
 class Comment(models.Model):
     content = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     parent_post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, default=None, null=True, related_name="children")
+    parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, default=None, null=True, blank=True, related_name="children")
     created_at = models.DateTimeField(auto_now_add=True)
-
+    upvote = models.ManyToManyField(User, related_name="comment_upvotes", blank=True)
+    downvote = models.ManyToManyField(User, related_name="comment_downvotes", blank=True)
     def __str__(self):
         return str(self.author)
 

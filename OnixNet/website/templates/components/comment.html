@@ -1,13 +1,21 @@
 {% load static %}
-{% load markdown_extras %}
 
-{% autoescape on %}
 <div class="card mt-1">
     <div class="card-body comment-content">
     {{ i.author }} - {{ i.created_at|timesince }} ago<br>
-    {{ i.content | markdown  }}
+    {{ i.content }}
     
         {% if user.is_authenticated %}
+        <div class="">
+            <a class="btn" {% if user.is_authenticated %} href="/c/{{ object.community.name }}/{{ object.pk }}/upvote/{{ i.pk }}" {% endif %}>
+                <img class="{% if i in user.comment_upvotes.all %}selected-vote{% endif %}" src="{% static 'icons/custom/outline/arrow-up.svg' %}">
+                {{ i.upvote.all|length }}
+            </a>
+            <a class="btn" {% if user.is_authenticated %} href="/c/{{ object.community.name }}/{{ object.pk }}/downvote/{{ i.pk }}"{% endif %}>
+                <img class="{% if i in user.comment_downvotes.all %}selected-vote{%endif%}" src="{% static 'icons/custom/outline/arrow-down.svg' %}">
+                {{ i.downvote.all|length }}
+            </a>
+        </div>
 
   <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#commentform{{ i.pk }}" aria-expanded="false" aria-controls="commentform{{ i.pk }}">
     <img src="{% static 'icons/custom/outline/messages.svg' %}" alt="Comment">
@@ -34,4 +42,3 @@
     </div>
 </div>
 
-{% endautoescape %}
