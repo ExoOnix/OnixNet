@@ -95,8 +95,8 @@ class PostDetailView(DetailView, FormMixin):
         # Retrieve comments and annotate them with the count of upvotes
         comments = (
             Comment.objects.filter(parent_post__pk=self.kwargs["pk"])
-            .annotate(num_upvotes=Count("upvote"))
-            .order_by("-num_upvotes")
+            .annotate(num_votes=(Count("upvote") - Count("downvote")))
+            .order_by("-num_votes")
         )
 
         context["comments"] = comments

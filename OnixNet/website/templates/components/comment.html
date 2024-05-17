@@ -35,9 +35,11 @@
         {% endif %}
 
     {% if i.children %}
-        {% for i in i.children.all %}
+    
+        {% for i in i.children.all|dictsortreversed:"upvotes_count" %}
             {% include 'components/comment.html' %}
         {% endfor %}
+        
     {% endif %}
     </div>
 </div>

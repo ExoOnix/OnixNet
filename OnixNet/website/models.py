@@ -46,8 +46,11 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     upvote = models.ManyToManyField(User, related_name="comment_upvotes", blank=True)
     downvote = models.ManyToManyField(User, related_name="comment_downvotes", blank=True)
+    @property
+    def upvotes_count(self):
+        return self.upvote.count() - self.downvote.count()
     def __str__(self):
-        return str(self.author)
+        return str(self.upvote.count() - self.downvote.count())
 
 
 class Attachment(models.Model):
