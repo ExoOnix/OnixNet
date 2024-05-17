@@ -22,6 +22,6 @@ class SignUpView(generic.CreateView):
         # authenticate user then login
         user = authenticate(username=username, password=password)
         login(self.request, user)
-
+        recommend.Update()
 
         return HttpResponseRedirect("/")
