@@ -5,24 +5,23 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin
 from django.http import HttpResponse
 from django.core.exceptions import PermissionDenied
+from .recommend import Recommend
+from django.db.models import Count
 
 import filetype
 
-# Reccomendation
+# Reccomendations
 import pandas as pd
 import numpy as np
 import scipy.stats
 
-# Similarity
-from sklearn.metrics.pairwise import cosine_similarity
-
 from .models import Post, Community, Comment, Attachment, Reaction
 from .forms import UploadForm, CommentForm, CommunityCreateForm
 
-class Reccomendation():
-    def Update(self):
-        pass
 
+recommend = Recommend()
+recommend.Update()
+# print(recommend.Recommend(1))
 class index(ListView):
     model = Post
     paginate_by = 100
@@ -37,7 +36,29 @@ class index(ListView):
         if search:
             object_list = Post.objects.filter(title__icontains=search).order_by('-created_at')
         else:
-            object_list = Post.objects.all().order_by("-created_at")
+            if self.request.user.is_authenticated:
+                # Fetch recommendations for the authenticated user
+                try:
+                    rec_list = recommend.Recommend(self.request.user.pk).values.tolist()
+                    # Extract post IDs from the recommendation list
+                    recommended_post_ids = [rec[0] for rec in rec_list]
+                    # Fetch posts corresponding to recommended post IDs
+                    recommended_posts = Post.objects.filter(pk__in=recommended_post_ids)
+                    # Extract remaining post IDs not in the recommendation list
+                    remaining_post_ids = [post.id for post in Post.objects.exclude(pk__in=recommended_post_ids)]
+                    # Fetch remaining posts
+                    remaining_posts = Post.objects.filter(pk__in=remaining_post_ids)
+
+                    # Concatenate recommended posts and remaining posts
+                    recommended_posts_list = list(recommended_posts)
+                    remaining_posts_list = list(remaining_posts.order_by('-created_at'))
+                    print(recommended_posts_list, remaining_posts_list)
+                    object_list = recommended_posts_list + remaining_posts_list
+                    # object_list = recommended_posts.union(remaining_posts, all=True)
+                except:
+                    object_list = Post.objects.all().order_by("-created_at")
+            else:
+                object_list = Post.objects.all().order_by("-created_at")
         return object_list
 
 class CommunityView(ListView):
@@ -63,20 +84,39 @@ class PostDetailView(DetailView, FormMixin):
     model = Post
     template_name = "post_detail.html"
     form_class = CommentForm
+
     def get_success_url(self):
         return redirect(".")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = CommentForm(initial={'post': self.object})
-        context["comments"] = Comment.objects.filter(parent_post__pk=self.kwargs["pk"]).order_by('-created_at')
-        context["upvotes"] = Reaction.objects.filter(parent_post=self.kwargs["pk"], vote=True)
-        context["downvotes"] = Reaction.objects.filter(parent_post=self.kwargs["pk"], vote=False)
+        context["form"] = CommentForm(initial={"post": self.object})
+
+        # Retrieve comments and annotate them with the count of upvotes
+        comments = (
+            Comment.objects.filter(parent_post__pk=self.kwargs["pk"])
+            .annotate(num_votes=(Count("upvote") - Count("downvote")))
+            .order_by("-num_votes")
+        )
+
+        context["comments"] = comments
+        context["upvotes"] = Reaction.objects.filter(
+            parent_post=self.kwargs["pk"], vote=True
+        )
+        context["downvotes"] = Reaction.objects.filter(
+            parent_post=self.kwargs["pk"], vote=False
+        )
+
         if self.request.user.is_authenticated:
-            context["is_upvote"] = Reaction.objects.filter(parent_post=self.kwargs["pk"], vote=True, user=self.request.user)
-            context["is_downvote"] = Reaction.objects.filter(parent_post=self.kwargs["pk"], vote=False, user=self.request.user)
+            context["is_upvote"] = Reaction.objects.filter(
+                parent_post=self.kwargs["pk"], vote=True, user=self.request.user
+            )
+            context["is_downvote"] = Reaction.objects.filter(
+                parent_post=self.kwargs["pk"], vote=False, user=self.request.user
+            )
 
         return context
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         form = self.get_form()
@@ -128,6 +168,7 @@ def Upload(request):
                                 video=f
                             )
                             attachment_instance.save()
+                            recommend.Update()
                 return HttpResponseRedirect(f"/c/{Community.objects.get(id=int(request.POST.get('community'))).name}/{post_instance.pk}")
 
         # if a GET (or any other method) we'll create a blank form
@@ -264,5 +305,38 @@ def DownvotePost(request, **kwargs):
             )
             reaction.save()
         return redirect(f"/c/{kwargs['community']}/{kwargs['pk']}")
+    else:
+        raise PermissionDenied
+
+
+def UpvoteComment(request, **kwargs):
+    if request.user.is_authenticated:
+        if not request.user.comment_downvotes.filter(pk=kwargs["pk"]).exists():
+
+            if request.user.comment_upvotes.filter(pk=kwargs["pk"]).exists():
+                comment = Comment.objects.get(pk=kwargs["pk"])
+                comment.upvote.remove(request.user)
+                comment.save()
+            else:
+                comment = Comment.objects.get(pk=kwargs["pk"])
+                comment.upvote.add(request.user)
+                comment.save()
+        return redirect(f"/c/{kwargs['community']}/{kwargs['post_pk']}")
+    else:
+        raise PermissionDenied
+
+
+def DownvoteComment(request, **kwargs):
+    if request.user.is_authenticated:
+        if not request.user.comment_upvotes.filter(pk=kwargs["pk"]).exists():
+            if request.user.comment_downvotes.filter(pk=kwargs["pk"]).exists():
+                comment = Comment.objects.get(pk=kwargs["pk"])
+                comment.downvote.remove(request.user)
+                comment.save()
+            else:
+                comment = Comment.objects.get(pk=kwargs["pk"])
+                comment.downvote.add(request.user)
+                comment.save()
+        return redirect(f"/c/{kwargs['community']}/{kwargs['post_pk']}")
     else:
         raise PermissionDenied

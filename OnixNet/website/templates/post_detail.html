@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 {% load static %}
-{% load markdown_extras %}
 
-{% autoescape on %}
+
 
 
 <div class="card w-75 center-x mt-4 overflow-auto" style="width: 18rem; height: 75vh">
@@ -46,7 +45,7 @@
 </div>
 </center>
         {% endif %}
-        <p>{{ object.content|markdown }}</p>
+        <p>{{ object.content }}</p>
         <div class="mt-3">
             <a class="btn" {% if user.is_authenticated %}href="/c/{{ object.community.name }}/{{ object.pk }}/upvote" {% endif %}>
                 <img class="{% if is_upvote %}selected-vote{% endif %}" src="{% static 'icons/custom/outline/arrow-up.svg' %}">
@@ -79,5 +78,4 @@
     </div>
 </div>
 
-{% endautoescape %}
 {% endblock %}
