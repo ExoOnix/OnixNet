@@ -14,9 +14,9 @@
 </a>
 </div>
 
-## Warning
 
-This project is not complete and is not in a usable state as of right now.
+[onixtech.org](https://onixtech.org).
+
 
 ## Running
 
