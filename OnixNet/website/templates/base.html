@@ -35,9 +35,11 @@
                     <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
+                <br>
                 <ul class="navbar-nav mb-2 mb-lg-0">
                     {% if user.is_authenticated %}
                     <a class="btn btn-outline-success me-1" href="{% url 'upload' %}">Create Post</a>
+                    <br>
                     <a class="btn btn-outline-success" href="{% url 'create-community' %}">Create Community</a>
                     {% endif %}
                     <li class="nav-item dropdown">
