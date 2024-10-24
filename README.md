@@ -15,7 +15,6 @@
 </div>
 
 
-[onixtech.org](https://onixtech.org).
 
 
 ## Running
